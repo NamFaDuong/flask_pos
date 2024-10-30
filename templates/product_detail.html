@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product-Detail</title>
+    {% include 'stylelink.html' %}
+</head>
+<body>
+    {% include 'nav.html' %}
+    <center>
+        <br>
+        <h3><b>Product Detail</b></h3>
+        <hr>
+        <div class="card" style="width: 65%;padding: 25px 25px;border-radius: 15px;">
+            <div class="wrapper row">
+                <div class="preview col-md-6">
+                    <img src="{{ product['image'] }}" class="card-img-top" style="width: 250px;">
+                </div>
+                <div class="details col-md-6" style="text-align: left;">
+                    <h4 class="card-title"><b>{{ product['title'] }}</b></h4>
+                    <p class="card-text">{{ product['description'] }}</p>
+                    <h3 class="price">Current Price: <span style="color: red;">{{ product['price'] }} $</span></h3>
+                    <h5>
+                        <mark style="background-color: yellow;color: black;padding:5px 30px ;border-radius:5px;">{{ product['category'] }}</mark>
+                    </h5>
+                    <div class="action">
+                        <br>
+                        <a href="/order?id={{ product['id'] }}" class="btn btn-outline-primary" style="width: 300px;" role="button" aria-pressed="true">Shop now</a>
+                    </div>
+                </div>
+            </div>
+		</div>
+    </center>
+    {% include "footer.html" %}
+</body>
+{% include 'scriptfile.html' %}
+</html>

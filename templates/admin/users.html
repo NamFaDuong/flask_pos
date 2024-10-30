@@ -1,0 +1,363 @@
+{% extends 'admin/main_template.html' %}
+{% block navheader %}
+    Users
+{% endblock %}
+{% block content %}
+    <div class="content-wrapper" id="app">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Users</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Users</a></li>
+                            <li class="breadcrumb-item active">Users</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+
+        {#Start Form Insert New User#}
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel" v-if="status == 'add'">Add New User</h5>
+                        <h5 class="modal-title" id="staticBackdropLabel" v-if="status == 'update'">Update User Information</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="/create_user" enctype="multipart/form-data">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" v-model="name" id="name" name="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select class="form-control" name="gender" v-model="gender" id="gender">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phonenumber" class="form-label">Phone Number</label>
+                                    <input type="text" class="form-control" v-model="phone" id="phonenumber" name="phonenumber">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email address</label>
+                                    <input type="email" class="form-control" v-model="email" id="email" name="email">
+                                </div>
+                                <input type="hidden" id="user_id" v-model="user_id">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="closeModel()">
+                            <i class="far fa-times-circle"></i>
+                            Close
+                        </button>
+
+                        <button type="button" class="btn btn-primary" @click="onSave()"
+                                v-if="status == 'add'">
+                            <i class="fas fa-save"></i>
+                            Save
+                        </button>
+                        <button type="button" id="save" class="btn btn-success" @click="onUpdate()"
+                                v-if="status == 'update'">
+                            <i class="fas fa-download"></i>
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#End Insert New User#}
+
+        {#  Pop up user detail  #}
+        <div class="modal fade" id="user_detail" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">User Detail</h5>
+                    </div>
+                    <div class="modal-body" v-for="(user, index) in user_detail">
+                        <div class="user_card"
+                             style="margin: auto; justify-content: center; text-align: center;">
+                            <h1 style="text-transform: uppercase;"> [[ user.name ]] </h1>
+                            <div class="icon" style="justify-content: space-between;font-size: 25px;">
+                                <i class="fab fa-facebook" style="color: blue;"></i>
+                                <i class="fab fa-facebook-messenger" style="color: blue;"></i>
+                                <i class="fab fa-instagram" style="color: red;"></i>
+                                <i class="fab fa-youtube" style="color: red;"></i>
+                            </div>
+                            <hr>
+                            <div class="user_data"
+                                 style="justify-content: center; display: flex;">
+                                <div class="user_description" style="text-align: left;">
+                                    <h3 style="padding-right: 50px; color: gray;">Gender</h3>
+                                    <h3 style="padding-right: 50px; color: gray;">Phone</h3>
+                                    <h3 style="padding-right: 50px; color: gray;">Email</h3>
+                                </div>
+                                <div class="user_information" style="text-align: left;">
+                                    <h3>[[ user.gender ]]</h3>
+                                    <h3>[[ user.phone ]]</h3>
+                                    <h3>[[ user.email ]]</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="closeUserDetail()">
+                            <i class="far fa-times-circle"></i>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {#  Pop up user detail  #}
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <button type="button" class="btn btn-outline-primary" @click="openModel()">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Add new
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive ">
+                                    <table class="table table-striped boder ">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Gender</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="userTableBody">
+                                        <tr v-for="(user, index) in users_list">
+                                            <td class="text-center">[[ index + 1 ]]</td>
+                                            <td class="text-left">[[ user.name ]]</td>
+                                            <td class="text-center">[[ user.gender ]]</td>
+                                            <td class="text-left">[[ user.phone ]]</td>
+                                            <td class="text-left">[[ user.email ]]</td>
+                                            <td>
+                                                <button type="button" class="btn btn-outline-secondary mr-2" @click="onDetail(user.id)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger mr-2" @click="onDelete(user.id)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning mr-2" @click="getEdit(user)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+{% endblock %}
+
+{% block scriptjs %}
+    <script>
+        const {createApp} = Vue;
+        createApp({
+            delimiters: ['[[', ']]'],
+            created() {
+                this.getData()
+            },
+            data() {
+                return {
+                    id: null,
+                    name: "",
+                    gender: "male",
+                    phone: "+855-",
+                    email: "@gmail.com",
+                    users_list: [],
+                    status: 'add',
+                    user_id: null,
+                    user_detail: null,
+                };
+            },
+            methods: {
+                openUserDetail() {
+                    $('#user_detail').modal('show')
+                },
+                closeUserDetail() {
+                    $('#user_detail').modal('hide')
+                },
+                openModel() {
+                    $('#myModal').modal('show')
+                },
+                closeModel() {
+                    $('#myModal').modal('hide')
+                    this.clearCode()
+                },
+                clearCode() {
+                    this.status = 'add',
+                        this.id = null,
+                        this.name = null,
+                        this.gender = "male",
+                        this.phone = "+855-",
+                        this.email = "@gmail.com"
+                },
+                getEdit(student, index) {
+                    this.id = index,
+                        this.status = 'update',
+                        this.name = student.name,
+                        this.gender = student.gender,
+                        this.phone = student.phone,
+                        this.email = student.email
+                    this.user_id = student.id,
+                        this.openModel()
+                },
+                onUpdate() {
+                    let current_student = {
+                        id: this.user_id,
+                        name: this.name,
+                        gender: this.gender,
+                        phone: this.phone,
+                        email: this.email
+                    };
+
+                    let vm = this;
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/update_user";
+
+                    // Use POST request instead of GET to update the user
+                    axios.put(url_api, current_student)
+                        .then(function (response) {
+                            // handle success
+                            console.log(response.data);
+                            vm.getData();
+                            $.LoadingOverlay("hide");
+                            vm.clearCode();
+                            vm.closeModel();
+                        })
+                        .catch(function (error) {
+                            alert("error");
+                            console.log(error);
+                        });
+                },
+                onDelete(index) {
+                    Swal.fire({
+                        title: "Do you want to save the changes?",
+                        showDenyButton: true,
+                        // showCancelButton: true,
+                        confirmButtonText: "Delete",
+                        denyButtonText: `cancel`
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            let vm = this
+                            $.LoadingOverlay("show");
+                            let url_api = "http://127.0.0.1:5000/delete_userid"
+                            // Make a request for a user with a given ID
+                            axios.post(url_api, {user_id: index})
+                                .then(function (response) {
+                                    // handle success
+                                    vm.getData()
+                                    $.LoadingOverlay("hide")
+                                })
+                                .catch(function (error) {
+                                    alert("error")
+                                    console.log(error);
+                                });
+                        } else if (result.isDenied) {
+                            //
+                        }
+                    });
+                },
+                getData() {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/getuser"
+                    // Make a request for a user with a given ID
+                    axios.get(url_api)
+                        .then(function (response) {
+                            // handle success
+                            vm.users_list = response.data
+                            $.LoadingOverlay("hide")
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                onSave() {
+                    if (this.name == null || this.name == '') {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Name field can't empty...!",
+                        });
+                        return
+                    }
+                    let currect_student = {
+                        name: this.name,
+                        gender: this.gender,
+                        phone: this.phone,
+                        email: this.email
+                    };
+
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/create_user"
+                    // Make a request for a user with a given ID
+                    axios.post(url_api, currect_student)
+                        .then(function (response) {
+                            vm.getData()
+                            $.LoadingOverlay("hide");
+                            vm.closeModel();
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                onDetail(user_id) {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/admin/user_detail"
+                    console.log(user_id)
+                    axios.post(url_api, {id: user_id})
+                        .then(function (response) {
+                            // handle success
+                            vm.user_detail = response.data
+                            vm.openUserDetail()
+                            $.LoadingOverlay("hide")
+
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                }
+            }
+        }).mount('#app');
+    </script>
+{% endblock %}

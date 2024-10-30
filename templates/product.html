@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product</title>
+    {% include 'stylelink.html' %}
+</head>
+<body>
+    {% include 'nav.html' %}
+    <center>
+        <div class="container" style="padding-top: 25px;">
+            <div class="row" style=" row-gap: 20px;">
+                {% for item in pro_list %}
+                    <div class="col-md-3 col-sm-4">
+                        <div class="card" style="height:100%;">
+                            <div style="width: 100px;justify-content: center;margin: auto; padding-top: 10px">
+                                <img src="{{ item['image'] }}" class="card-img-top">
+                            </div>
+                            <div class="card-body">
+                                <h2>{{ item['price'] }}$ </h2>
+                                <hr>
+                                <h5 class="card-title">{{ item['title'] }}</h5>
+                                <hr>
+                                <p class="card-text">Category: {{ item['category'] }}</p>
+                            </div>
+                            <div class="btn">
+                                <a href="/detail?id={{ item['id'] }}" target="_blank" class="btn btn-outline-primary">View Detail</a>
+                                <a href="/order?id={{ item['id'] }}" target="_blank" class="btn btn-outline-primary" role="button" aria-pressed="true">Shop now</a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                {% endfor %}
+            </div>
+    </div>
+    </center>
+    {% include "footer.html" %}
+</body>
+{% include 'scriptfile.html' %}
+</html>

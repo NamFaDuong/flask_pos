@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sent successfully</title>
+    {% include 'stylelink.html' %}
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container{
+            height: 10vh;
+            margin-top: 300px;
+        }
+        .popup{
+            width: 500px;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid black;
+            text-align: center;
+            padding: 0 50px 30px;
+            top: 50%;
+            margin: auto;
+        }
+        .popup img{
+            width: 100px;
+            border-radius: 50%;
+            margin-top: -50%;
+        }
+        .btn{
+            padding: 5px 50px;
+            background: #4CAF50;
+            color: white;
+        }
+        .btn:hover{
+            color: white;
+            background: #1a9a21;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="popup">
+            <img src="/static/green_double_circle_check_mark.jpg">
+            <h2>Thank you!</h2>
+            <p>Your detail has successfully submit. Thanks ! </p>
+            <a href="/products" class="btn">Ok</a>
+        </div>
+    </div>
+</body>
+</html>

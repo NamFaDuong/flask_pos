@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    {% include 'stylelink.html' %}
+    <style>
+        .container{
+        margin: auto;
+    }
+    .container .container-home{
+        background-image: url('/static/background.jpg');
+        width: 100%;
+        height: 100vh;
+        background-size: cover ;
+        background-position: center;
+        padding-top: 300px;
+    }
+    .container .container-home form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50%;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        margin-top: 15px;
+    }
+
+    .container .container-home form input[type="search"] {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        outline: none;
+        background-color: #f5f5f5;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .container .container-home form button[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .container .container-home form button[type="submit"]:hover{
+        background-color: #007804;
+    }
+    </style>
+</head>
+<body>
+    {% include 'nav.html' %}
+    <center>
+        <div class="container">
+            <div class="container-home">
+                <form action="/search" method="get">
+                    <input type="search" name="q" placeholder="Search..." required>
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
+                </form>
+            </div>
+        </div>
+    </center>
+    {% include 'footer.html' %}
+</body>
+{% include 'scriptfile.html' %}
+</html>

@@ -1,0 +1,324 @@
+{% extends 'admin/main_template.html' %}
+{% block navheader %}
+    Categories
+{% endblock %}
+{% block content %}
+    <div class="content-wrapper" id="app">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Categories List</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Categories List</a></li>
+                            <li class="breadcrumb-item active">Categories</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Add New Category</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="/create_category" enctype="multipart/form-data">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="category_name">Category name</label>
+                                    <input type="text" v-model="form.name" class="form-control" id="category_name" placeholder="Your products category">
+                                </div>
+                                <div class="form-group">
+                                    <label for="category_description">Category Description</label>
+                                    <textarea class="form-control" v-model="form.description" id="category_description" rows="3" placeholder="Descriptions"></textarea>
+                                </div>
+                                <input type="hidden" v-model="category_id">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="closeModel()">
+                            <i class="far fa-times-circle"></i>
+                            Close
+                        </button>
+
+                        <button type="button" class="btn btn-primary" @click="onSave()"
+                                v-if="status == 'add'">
+                            <i class="fas fa-save"></i>
+                            Save
+                        </button>
+
+                        <button type="button" id="save" class="btn btn-success" @click="onUpdate()"
+                                v-if="status == 'update'">
+                            <i class="fas fa-download"></i>
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#End Insert New User#}
+
+        {#  Pop up Category detail  #}
+        <div class="modal fade" id="category_detail" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Category Detail</h5>
+                    </div>
+                    <div class="modal-body" v-for="(category, index) in category_detail">
+                        <div class="user_card"
+                             style="margin: auto; justify-content: center; text-align: center;">
+                            <h3 style="text-transform: uppercase;color: #00bc8c"> [[ category.name ]] </h3>
+                            <div class="icon" style="justify-content: space-between;font-size: 25px;">
+                                <h5 style="text-transform: capitalize;"> [[ category.description ]] </h5>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="closeCategoryDetail()">
+                            <i class="far fa-times-circle"></i>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#  Pop up user detail  #}
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <button type="button" class="btn btn-outline-primary" @click="openModel()">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Add new
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive ">
+                                    <table class="table table-striped boder ">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Category Name</th>
+                                            <th>Description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="userTableBody">
+                                        <tr v-for="(category, index) in categories_list">
+                                            <td class="text-center">[[ index + 1 ]]</td>
+                                            <td class="text-left">[[ category.name ]]</td>
+                                            <td class="text-left">[[ category.description ]]</td>
+                                            <td>
+                                                <button type="button" class="btn btn-outline-secondary mr-2" @click="onDetail(category.id)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger mr-2" @click="onDelete(category.id)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning mr-2" @click="getEdit(category)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+{% endblock %}
+{% block scriptjs %}
+    <script>
+        const {createApp} = Vue;
+        createApp({
+            delimiters: ['[[', ']]'],
+            created() {
+                this.getData()
+            },
+            data() {
+                return {
+                    form: {
+                        id: null,
+                        name: "",
+                        description: ""
+                    },
+                    categories_list: [],
+                    status: 'add',
+                    category_id: null,
+                    category_detail: null,
+                };
+            },
+            methods: {
+                openCategoryDetail() {
+                    $('#category_detail').modal('show')
+                },
+                closeCategoryDetail() {
+                    $('#category_detail').modal('hide')
+                },
+                openModel() {
+                    $('#myModal').modal('show')
+                },
+                closeModel() {
+                    $('#myModal').modal('hide')
+                    this.clearCode()
+                },
+                clearCode() {
+                    this.form = {
+                        name: "",
+                        description: ""
+                    },
+                        this.status = 'add',
+                        this.category_id = null,
+                        this.category_detail = null
+                },
+                getData() {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/getCategory"
+                    // Make a request for a user with a given ID
+                    axios.get(url_api)
+                        .then(function (response) {
+                            // handle success
+                            vm.categories_list = response.data
+                            $.LoadingOverlay("hide")
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                onDelete(category_id) {
+                    Swal.fire({
+                        title: "Do you want to delete this Category?",
+                        showDenyButton: true,
+                        confirmButtonText: "Delete",
+                        denyButtonText: `cancel`
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            let vm = this
+                            $.LoadingOverlay("show");
+                            let url_api = "http://127.0.0.1:5000/delete_category"
+                            // Make a request for a user with a given ID
+                            axios.post(url_api, {category_id: category_id})
+                                .then(function (response) {
+                                    // handle success
+                                    vm.getData()
+                                    $.LoadingOverlay("hide")
+                                })
+                                .catch(function (error) {
+                                    alert("error")
+                                    console.log(error);
+                                });
+                        } else if (result.isDenied) {
+                            //
+                        }
+                    });
+                },
+                onSave() {
+                    if (this.form.name == null || this.form.name == '') {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Name field can't empty...!",
+                        });
+                        return
+                    }
+
+                    let currect_category = {
+                        name: this.form.name,
+                        description: this.form.description
+                    };
+
+                    console.log(currect_category);
+
+                    let vm = this
+
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/create_category"
+                    // Make a request for a user with a given ID
+                    axios.post(url_api, currect_category)
+                        .then(function (response) {
+                            vm.getData()
+                            $.LoadingOverlay("hide");
+                            vm.closeModel();
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                getEdit(cateogry, index) {
+                    this.id = index,
+                        this.status = 'update',
+                        this.form.name = cateogry.name,
+                        this.form.description = cateogry.description,
+                        this.category_id = cateogry.id,
+                        this.openModel()
+                },
+                onUpdate() {
+                    let current_category = {
+                        id: this.category_id,
+                        name: this.form.name,
+                        description: this.form.description
+                    };
+                    console.log(current_category);
+
+                    let vm = this;
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/update_category";
+
+                    // Use POST request instead of GET to update the user
+                    axios.put(url_api, current_category)
+                        .then(function (response) {
+                            vm.getData();
+                            $.LoadingOverlay("hide");
+                            vm.closeModel();
+                        })
+                        .catch(function (error) {
+                            alert("error");
+                            console.log(error);
+                        });
+                },
+                onDetail(category_id) {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/category_detail"
+
+                    axios.post(url_api, {id: category_id})
+                        .then(function (response) {
+                            // handle success
+                            vm.category_detail = response.data
+                            vm.openCategoryDetail()
+                            $.LoadingOverlay("hide")
+
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+            },
+        }).mount('#app');
+    </script>
+{% endblock %}

@@ -1,0 +1,285 @@
+{% extends 'admin/main_template.html' %}
+{% block navheader %}
+    Tags
+{% endblock %}
+{% block content %}
+    <div class="content-wrapper" id="app">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Tags List</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Tags List</a></li>
+                            <li class="breadcrumb-item active">Tags</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Add New Tags</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="/create_tags" enctype="multipart/form-data">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="tag_name">Tag name</label>
+                                    <input type="text" v-model="form.name" class="form-control" id="tag_name" placeholder="Your tag">
+                                </div>
+                                <div class="form-group">
+                                    <label for="tag_description">Tag Description</label>
+                                    <textarea class="form-control" v-model="form.description" id="tag_description" rows="3" placeholder="Descriptions"></textarea>
+                                </div>
+                                <input type="hidden" v-model="tag_id">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="closeModel()">
+                            <i class="far fa-times-circle"></i>
+                            Close
+                        </button>
+
+                        <button type="button" class="btn btn-primary" @click="onSave()"
+                                v-if="status == 'add'">
+                            <i class="fas fa-save"></i>
+                            Save
+                        </button>
+
+                        <button type="button" id="save" class="btn btn-success" @click="onUpdate()"
+                                v-if="status == 'update'">
+                            <i class="fas fa-download"></i>
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#End Insert New User#}
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <button type="button" class="btn btn-outline-primary" @click="openModel()">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Add new
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive ">
+                                    <table class="table table-striped boder ">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Tag Name</th>
+                                            <th>Description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="userTableBody">
+                                        <tr v-for="(tag, index) in tags_list">
+                                            <td class="text-center">[[ index + 1 ]]</td>
+                                            <td class="text-left">[[ tag.name ]]</td>
+                                            <td class="text-left">[[ tag.description ]]</td>
+                                            <td>
+                                                <button type="button" class="btn btn-outline-danger mr-2" @click="onDelete(tag.id)">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning mr-2" @click="getEdit(tag)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+{% endblock %}
+{% block scriptjs %}
+    <script>
+        const {createApp} = Vue;
+        createApp({
+            delimiters: ['[[', ']]'],
+            created() {
+                this.getData()
+            },
+            data() {
+                return {
+                    form: {
+                        id: null,
+                        name: "",
+                        description: ""
+                    },
+                    tags_list: [],
+                    status: 'add',
+                    tag_id: null,
+                };
+            },
+            methods: {
+                openModel() {
+                    $('#myModal').modal('show')
+                },
+                closeModel() {
+                    $('#myModal').modal('hide')
+                    this.clearCode()
+                },
+                clearCode() {
+                    this.form = {
+                        name: "",
+                        description: ""
+                    },
+                        this.status = 'add',
+                        this.tag_id = null
+                },
+                getData() {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/getTags"
+                    // Make a request for a user with a given ID
+                    axios.get(url_api)
+                        .then(function (response) {
+                            // handle success
+                            vm.tags_list = response.data
+                            $.LoadingOverlay("hide")
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                onDelete(tag_id) {
+                    Swal.fire({
+                        title: "Do you want to delete this tag?",
+                        showDenyButton: true,
+                        confirmButtonText: "Delete",
+                        denyButtonText: `cancel`
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            let vm = this
+                            $.LoadingOverlay("show");
+                            let url_api = "http://127.0.0.1:5000/delete_tags"
+                            // Make a request for a user with a given ID
+                            axios.post(url_api, {tag_id: tag_id})
+                                .then(function (response) {
+                                    // handle success
+                                    vm.getData()
+                                    $.LoadingOverlay("hide")
+                                })
+                                .catch(function (error) {
+                                    alert("error")
+                                    console.log(error);
+                                });
+                        } else if (result.isDenied) {
+                            //
+                        }
+                    });
+                },
+                onSave() {
+                    if (this.form.name == null || this.form.name == '') {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Name field can't empty...!",
+                        });
+                        return
+                    }
+
+                    let currect_tag = {
+                        name: this.form.name,
+                        description: this.form.description
+                    };
+
+                    console.log(currect_tag);
+
+                    let vm = this
+
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/create_tags"
+                    // Make a request for a user with a given ID
+                    axios.post(url_api, currect_tag)
+                        .then(function (response) {
+                            vm.getData()
+                            $.LoadingOverlay("hide");
+                            vm.closeModel();
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                getEdit(tag, index) {
+                    this.id = index,
+                        this.status = 'update',
+                        this.form.name = tag.name,
+                        this.form.description = tag.description,
+                        this.tag_id = tag.id,
+                        this.openModel()
+                },
+                onUpdate() {
+                    let current_tag = {
+                        id: this.tag_id,
+                        name: this.form.name,
+                        description: this.form.description
+                    };
+                    console.log(current_tag);
+
+                    let vm = this;
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/update_tags";
+
+                    // Use POST request instead of GET to update the user
+                    axios.put(url_api, current_tag)
+                        .then(function (response) {
+                            vm.getData();
+                            $.LoadingOverlay("hide");
+                            vm.closeModel();
+                        })
+                        .catch(function (error) {
+                            alert("error");
+                            console.log(error);
+                        });
+                },
+                onDetail(brand_id) {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/brands_detail"
+
+                    axios.post(url_api, {id: brand_id})
+                        .then(function (response) {
+                            // handle success
+                            vm.brand_detail = response.data
+                            vm.openCategoryDetail()
+                            $.LoadingOverlay("hide")
+
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+            },
+        }).mount('#app');
+    </script>
+{% endblock %}
