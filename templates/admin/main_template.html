@@ -66,6 +66,14 @@
                             </p>
                         </a>
                     </li>
+                <li class="nav-item">
+                        <a href="/admin/invoice" class="nav-link {% if module =='invoice' %}active{% endif %}">
+                            <i class="fas fa-file-invoice"></i>
+                            <p>
+                                Invoice
+                            </p>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="/admin/users" class="nav-link {% if module =='users' %}active{% endif %}">
                             <i class="fas fa-users"></i>
@@ -74,7 +82,6 @@
                             </p>
                         </a>
                     </li>
-
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link {% if module['Products'] =='Products' %}active{% endif %}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -116,6 +123,7 @@
                             </li>
                         </ul>
                     </li>
+
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->

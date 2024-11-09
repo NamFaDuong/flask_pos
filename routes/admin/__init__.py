@@ -5,3 +5,5 @@ from routes.admin import products_list
 from routes.admin import tags
 from routes.admin import units
 from routes.admin import users
+from routes.admin import pos
+from routes.admin import invoice

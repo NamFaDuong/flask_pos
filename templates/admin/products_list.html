@@ -31,7 +31,7 @@
                         <h5 class="modal-title" id="staticBackdropLabel">Add New Category</h5>
                     </div>
                     <div class="modal-body">
-                        <form method="post" action="/create_category" enctype="multipart/form-data">
+                        <form method="post" action="/" enctype="multipart/form-data">
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-lg-6">
@@ -60,11 +60,11 @@
                                                 <div class="row ml-3">
                                                     <div class="form-group pr-4">
                                                         <label for="product_cost">Cost <span style="color: red">*</span></label>
-                                                        <input v-model="form.cost" type="number" class="form-control" id="product_cost" placeholder="Your products cost">
+                                                        <input v-model="form.cost" type="number" class="form-control" id="product_cost" required placeholder="Your products cost">
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="product_price">Price <span style="color: red">*</span></label>
-                                                        <input v-model="form.price" type="number" class="form-control" id="product_price" placeholder="Your products cost">
+                                                        <input v-model="form.price" type="number" class="form-control" id="product_price" required placeholder="Your products cost">
                                                     </div>
                                                 </div>
                                             </div>
@@ -133,6 +133,19 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="card">
+                                            <div class="card-header border-0">
+                                                <h3 class="card-title">Quantity</h3>
+                                            </div>
+                                            <div class="card-body table-responsive pr-3 pl-3">
+                                                <div class="row ml-3">
+                                                    <div class="form-group pr-4">
+                                                        <label for="product_cost">Qty <span style="color: red">*</span></label>
+                                                        <input v-model="form.qty" type="number" class="form-control" id="product_cost" required placeholder="Your products cost">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                     </div>
                                     <!-- /.col-md-6 -->
@@ -164,41 +177,34 @@
         </div>
         {#End Insert New User#}
 
-        {#  Pop up user detail  #}
+        {#  Pop up Product detail  #}
         <div class="modal fade" id="product_detail" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">User Detail</h5>
+                        <h5 class="modal-title" id="staticBackdropLabel">Product Detail</h5>
                     </div>
-                    <div class="modal-body" v-for="(user, index) in user_detail">
-                        <div class="user_card"
-                             style="margin: auto; justify-content: center; text-align: center;">
-                            <h1 style="text-transform: uppercase;"> [[ user.name ]] </h1>
-                            <div class="icon" style="justify-content: space-between;font-size: 25px;">
-                                <i class="fab fa-facebook" style="color: blue;"></i>
-                                <i class="fab fa-facebook-messenger" style="color: blue;"></i>
-                                <i class="fab fa-instagram" style="color: red;"></i>
-                                <i class="fab fa-youtube" style="color: red;"></i>
+                    <div class="modal-body">
+                        <div class="row" v-for="(product, index) in product_detail">
+                            <div class="preview col-md-6" style="height: 100%;margin: auto;justify-content: center;text-transform: capitalize">
+                                <img src="/static/No_Image_Available.jpg" class="card-img-top p-2" style="width: 250px;">
                             </div>
-                            <hr>
-                            <div class="user_data"
-                                 style="justify-content: center; display: flex;">
-                                <div class="user_description" style="text-align: left;">
-                                    <h3 style="padding-right: 50px; color: gray;">Gender</h3>
-                                    <h3 style="padding-right: 50px; color: gray;">Phone</h3>
-                                    <h3 style="padding-right: 50px; color: gray;">Email</h3>
-                                </div>
-                                <div class="user_information" style="text-align: left;">
-                                    <h3>[[ user.gender ]]</h3>
-                                    <h3>[[ user.phone ]]</h3>
-                                    <h3>[[ user.email ]]</h3>
-                                </div>
+                            <div class="details col-md-6" style="text-align: left;">
+                                <h3 style="text-transform: capitalize">[[ product.name ]]</h3>
+                                <p class="card-title" style="text-transform: capitalize">[[product.description]]</p>
+                                <h4 class="card-text">Current Cost: <span style="color: red;">$[[product.cost]]</span></h4>
+                                <h4 class="price">Current Price: <span style="color: red;">$[[product.price]]</span></h4>
+                                <p style="display: grid; grid-template-columns: repeat(2,1fr);gap: .5rem">
+                                    <mark style="background-color: yellow;color: black;border-radius:5px;text-align: center">[[product.category_name]]</mark>
+                                    <mark style="background-color: yellow;color: black;border-radius:5px;text-align: center">[[product.brand_name]]</mark>
+                                    <mark style="background-color: yellow;color: black;border-radius:5px;text-align: center">[[product.unit_name]]</mark>
+                                    <mark style="background-color: yellow;color: black;border-radius:5px;text-align: center">[[product.tag_name]]</mark>
+                                </p>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-danger" @click="closeUserDetail()">
+                        <button type="button" class="btn btn-outline-danger" @click="closeModelProduct()">
                             <i class="far fa-times-circle"></i>
                             Close
                         </button>
@@ -222,19 +228,19 @@
                                 </button>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped boder ">
+                                <div class="table-responsive" style="height: 450px;overflow-y:scroll;">
+                                    <table class="table table-striped border">
                                         <thead class="table-light">
                                         <tr>
                                             <th>#</th>
                                             <th>Name</th>
-                                            <th>Description</th>
-                                            <th>cost</th>
-                                            <th>price</th>
-                                            <th>category_name</th>
-                                            <th>brand_name</th>
-                                            <th>unit_name</th>
-                                            <th>tag_name</th>
+                                            {#                                            <th>Description</th>#}
+                                            <th>Cost</th>
+                                            <th>Price</th>
+                                            <th>Category</th>
+                                            <th>Brand</th>
+                                            <th>Unit</th>
+                                            <th>Tag</th>
                                             <th>Action</th>
                                         </tr>
                                         </thead>
@@ -242,7 +248,7 @@
                                         <tr v-for="(product, index) in product_list">
                                             <td class="text-center">[[ index + 1 ]]</td>
                                             <td class="text-left">[[ product.name ]]</td>
-                                            <td class="text-left">[[ product.description ]]</td>
+                                            {#                                            <td class="text-left">[[ product.description ]]</td>#}
                                             <td class="text-left">[[ product.cost ]]</td>
                                             <td class="text-left">[[ product.price ]]</td>
                                             <td class="text-left">[[ product.category_name ]]</td>
@@ -290,17 +296,19 @@
                     brands_list: [],
                     categories_list: [],
                     product_list: [],
-                    form:{
-                        name : "",
-                        description : "",
-                        cost : "",
-                        price : "",
-                        tag : 0,
-                        brand : 0,
-                        category : 0,
-                        unit : 0
+                    form: {
+                        name: "",
+                        description: "",
+                        cost: "",
+                        price: "",
+                        tag: 0,
+                        brand: 0,
+                        category: 0,
+                        unit: 0,
+                        qty: 0
                     },
-                    product_id : null,
+                    product_id: null,
+                    product_detail: null
                 };
             },
             methods: {
@@ -368,20 +376,21 @@
                         }
                     });
                 },
-                clearCode(){
-                    this.form={
-                        name : "",
-                        description : "",
-                        cost : "",
-                        price : "",
-                        tag : 0,
-                        brand : 0,
-                        category : 0,
-                        unit : 0
+                clearCode() {
+                    this.form = {
+                        name: "",
+                        description: "",
+                        cost: "",
+                        price: "",
+                        tag: 0,
+                        brand: 0,
+                        category: 0,
+                        unit: 0,
+                        qty:0
                     }
 
                 },
-                onSave(){
+                onSave() {
                     if (this.form.name == null || this.form.name == '') {
                         Swal.fire({
                             icon: "error",
@@ -400,9 +409,8 @@
                         brand: this.form.brand,
                         category: this.form.category,
                         unit: this.form.unit,
+                        qty:this.form.qty
                     };
-
-                    console.log(currect_product)
                     let vm = this
                     $.LoadingOverlay("show");
                     let url_api = "http://127.0.0.1:5000/new_product"
@@ -418,23 +426,23 @@
                             console.log(error);
                         });
                 },
-                onEdit(product,index){
+                onEdit(product, index) {
                     console.log(product)
-                        this.status = 'update',
+                    this.status = 'update',
                         this.form.name = product.name,
-                        this.form.description= product.description,
-                        this.form.cost= product.cost,
-                        this.form.price= product.price,
-                        this.form.tag= product.tag_id,
-                        this.form.brand= product.brand_id,
-                        this.form.category= product.category_id,
-                        this.form.unit= product.unit_id,
+                        this.form.description = product.description,
+                        this.form.cost = product.cost,
+                        this.form.price = product.price,
+                        this.form.tag = product.tag_id,
+                        this.form.brand = product.brand_id,
+                        this.form.category = product.category_id,
+                        this.form.unit = product.unit_id,
                         this.product_id = product.id
-                        this.openModel()
-                    },
-                onUpdate(){
+                    this.openModel()
+                },
+                onUpdate() {
                     let currect_product = {
-                        id:this.product_id,
+                        id: this.product_id,
                         name: this.form.name,
                         description: this.form.description,
                         cost: this.form.cost,
@@ -465,15 +473,13 @@
                 onDetail(product_id) {
                     let vm = this
                     $.LoadingOverlay("show");
-                    let url_api = "http://127.0.0.1:5000/admin/product_detail"
-                    console.log(user_id)
-                    axios.post(url_api, {id: product_id})
+                    let url_api = "http://127.0.0.1:5000/products_detail?id=" + product_id
+                    axios.get(url_api)
                         .then(function (response) {
                             // handle success
-                            vm.user_detail = response.data
+                            vm.product_detail = response.data
                             vm.openModelProduct()
                             $.LoadingOverlay("hide")
-
                         })
                         .catch(function (error) {
                             alert("error")

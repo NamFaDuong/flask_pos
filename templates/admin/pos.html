@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS</title>
+    <link rel="stylesheet" href="/static/dist/css/style.css">
+    {% include("admin/link_style.html") %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+</head>
+
+<body>
+<div id="app">
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="#" class="nav__link">
+                <h3 class="logo">POS</h3>
+            </a>
+
+            <div class="search_bar" id="search-bar">
+                <div class="form-group">
+                    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Search Product">
+                </div>
+            </div>
+
+            <div class="date_time">
+                <i class="fa-solid fa-calendar"></i>
+                <p class="datetime" id="datetime">
+                    <script>
+                        function updateCambodiaTime() {
+                            // Get the current time in Cambodia's timezone
+                            const options = {
+                                timeZone: 'Asia/Phnom_Penh',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false,  // Use 24-hour format
+                            };
+                            const now = new Date().toLocaleString('en-US', options);
+
+                            // Display the formatted time in the div
+                            document.getElementById('datetime').innerText = now;
+                        }
+
+                        setInterval(updateCambodiaTime, 1000);
+                        updateCambodiaTime();
+                    </script>
+                </p>
+            </div>
+
+            <div class="currency">
+                <div class="currency__dollar"
+                     style="color: white; background-color: red; padding:0 1rem; border-radius: 5px;">1$
+                </div>
+                <div class="equal"> =</div>
+                <div class="currency__dollar"
+                     style="color: white; background-color: red; padding:0 1rem; border-radius: 5px;"> ៛ 4,100
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="content__container">
+            <div class="category__choosing" style="overflow-y: scroll;height: 45px">
+                <button type="button" @click="getFetch()" class="btn btn-outline-primary m-1">All</button>
+                <button type="button" class="btn btn-outline-primary m-1" v-for="category in categories_list" @click="getFilterbyCategory(category.id)">[[category.name]]</button>
+            </div>
+            <hr>
+            <div class="production">
+                <div class="product__items grid">
+                    <div v-for="(product, index) in product_list">
+                        <div class="product__content" id="product-content" @click="shop_cart(product)">
+                            <img src="/static/dist/img/product-1.png" alt="image" class="product__img">
+                            <h3 class="product__title">[[ product.name ]]</h3>
+                            <div class="product__prices">
+                                <span class="product__price">[[ product.price]] $</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="order__container">
+            <div class="card_header">
+                <div class="invoice_number">
+                    <h3>ORDER</h3>
+                </div>
+                <hr>
+                <div class="product_listing">
+                    <div class="cart__container">
+                        <article class="cart__card" v-for="(item,index) in cart_list">
+                            <div class="cart__box">
+                                <img src="/static/dist/img/product-1.png" alt="" class="cart__img">
+                            </div>
+                            <div class="cart__details">
+                                <div class="product_infor">
+                                    <h3 class="cart__title">[[item.name]]</h3>
+                                    <span class="cart__price">[[item.price]]</span>
+                                </div>
+                                <div class="cart__amount">
+                                    <div class="cart__amount-content">
+                                        <span class="cart__amount-number">
+                                            <input type="number"
+                                                   style="width: 50px;text-align: center;" name="qty"
+                                                   id="qty" v-model="item.qty"
+                                                   @input="calculate_Total()">
+                                        </span>
+                                        <button class="cart__amount-box" @click="delete_item(index)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                    <hr>
+                    <div class="calculate__price">
+                        <span class="cart__item">[[count_product]] item</span>
+                        <div class="cart__prices">
+                            <div class="cart__label" style="padding-left: 200px;">
+                                <h5 class="total__price">Total Price: </h5>
+                            </div>
+                            <div class="cart__price">
+                                <h5 class="total__price-Dollar">$ [[total_price.toFixed(2)]]</h5>
+                            </div>
+                        </div>
+
+                        <form class="form-inline" style="padding-left: 140px;">
+                            <div class="form-group pb-3" style="display: flex;">
+                                <label for="discount" class="col-sm-2 col-form-label">Discount: </label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" id="discount" name="discount"
+                                           placeholder="0%" v-model="discount_percent" @input="discount()">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="cart__prices">
+                            <div class="cart__label" style="padding-left: 200px;">
+                                <h5 class="total__price">Grand Total: </h5>
+                            </div>
+                            <div class="cart__price">
+                                <h5 class="total__price-Dollar">$ [[grand_total.toFixed(2)]]</h5>
+                            </div>
+                        </div>
+
+                        <form class="form-inline" style="padding-left: 140px;">
+                            <div class="form-group pb-3" style="display: flex;">
+                                <label for="payment" class="col-sm-2 col-form-label">Payment: </label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" id="payment" name="payment"
+                                           placeholder="payment" v-model="payment_amount" @input="calculateReturn_price()">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="cart__prices">
+                            <div class="cart__label" style="padding-left: 200px;">
+                                <h5 class="total__price">Return Price: </h5>
+                            </div>
+                            <div class="cart__price">
+                                <h5 class="total__price-Dollar">$ [[return_price.toFixed(2)]]</h5>
+                            </div>
+                        </div>
+
+                        <div class="button__action">
+                            <button type="button" class="btn btn-primary m-2" @click="payment()">Payment</button>
+                            <button type="button" class="btn btn-outline-danger m-2">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <template>
+        <div>
+            <div id="reportContent" class="reportContent">
+                <div class="header_report">
+                    <div class="img_logo_content">
+                        <img src="/static/Logo-Feeling%20page.jpg" alt="" class="logo_report">
+                    </div>
+                    <h2 class="title_report">ST-8/9</h2>
+                    <div class="content">
+                        <div class="left_report_content_1">
+                            <h4 class="text_infor">Phone: 088 855 9877</h4>
+                            <h4 class="text_infor">Address: SETEC Institute</h4>
+                        </div>
+                        <div class="right_report_content_1">
+                            <h4 class="text_infor">Email: setec@gmail.com</h4>
+                            <h4 class="text_infor">website: <a href="https://www.setecu.com/">www.setecu.com</a></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="content_report">
+                    <table class="table border">
+                        <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">item</th>
+                            <th scope="col">qty</th>
+                            <th scope="col">price/unit</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(item,index) in cart_list">
+                            <th scope="row">[[ index + 1 ]]</th>
+                            <td>[[item.name]]</td>
+                            <td>[[item.qty]]</td>
+                            <td>[[item.price]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="footer_report">
+                    <div class="label_content" style="padding-right: 2rem;">
+                        <h4 class="text_infor">Total price :</h4>
+                        <h4 class="text_infor">Discount :</h4>
+                        <h4 class="text_infor">Grand Total :</h4>
+                        <h4 class="text_infor">Return Price :</h4>
+                    </div>
+                    <div class="infor_content">
+                        <h4 class="text_infor">[[total_price.toFixed(2)]]$</h4>
+                        <h4 class="text_infor">[[discount_percent]]%</h4>
+                        <h4 class="text_infor">[[grand_total.toFixed(2)]]$</h4>
+                        <h4 class="text_infor">[[return_price.toFixed(2)]]$</h4>
+                    </div>
+                </div>
+                <div class="img_logo_content">
+                    <img src="/static/qr_code.jpg" alt="" class="qr_report">
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
+{% include("admin/link_script.html") %}
+<script>
+    const {createApp} = Vue;
+    createApp({
+        delimiters: ['[[', ']]'],
+        created() {
+            this.getFetch(),
+                this.getCategory()
+        },
+        data() {
+            return {
+                product_list: [],
+                categories_list: [],
+                cart_list: [],
+                count_product: '0',
+                total_price: 0,
+                payment_amount: 0,
+                discount_percent: 0,
+                grand_total: 0,
+                return_price: 0
+            };
+        },
+        methods: {
+            printReport() {
+                const printContents = document.getElementById("reportContent").innerHTML;
+                const originalContents = document.body.innerHTML;
+
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+                window.location.reload();
+            },
+            clearData() {
+                this.product_list = [],
+                    this.categories_list = [],
+                    this.cart_list = [],
+                this.count_product - '0',
+                    this.total_price = 0,
+                    this.payment_amount = 0,
+                    this.discount_percent = 0,
+                    this.grand_total = 0
+            },
+            getFetch() {
+                let vm = this
+                $.LoadingOverlay("show");
+                let url_api = "http://127.0.0.1:5000/getProductForsale"
+                // Make a request for a user with a given ID
+                axios.get(url_api)
+                    .then(function (response) {
+                        // handle success
+                        vm.product_list = response.data
+                        $.LoadingOverlay("hide")
+                    })
+                    .catch(function (error) {
+                        alert("error")
+                        console.log(error);
+                    });
+            },
+            getCategory() {
+                let vm = this
+                $.LoadingOverlay("show");
+                let url_api = "http://127.0.0.1:5000/getCategory"
+                // Make a request for a user with a given ID
+                axios.get(url_api)
+                    .then(function (response) {
+                        // handle success
+                        vm.categories_list = response.data
+                        $.LoadingOverlay("hide")
+                    })
+                    .catch(function (error) {
+                        alert("error")
+                        console.log(error);
+                    });
+            },
+            getFilterbyCategory(category_id) {
+                let vm = this
+                $.LoadingOverlay("show");
+                let url_api = "http://127.0.0.1:5000/getProductByCategory?category_id=" + category_id
+                // Make a request for a user with a given ID
+                axios.get(url_api)
+                    .then(function (response) {
+                        // handle success
+                        vm.product_list = response.data
+                        vm.getCategory()
+                        $.LoadingOverlay("hide")
+                    })
+                    .catch(function (error) {
+                        alert("error")
+                        console.log(error);
+                    });
+            },
+            shop_cart(product) {
+                let vm = this
+                let is_dpl = false
+                let dpl = this.cart_list.find(obj => {
+                    if (obj.product_id == product.id) {
+                        obj.qty++
+                        is_dpl = true
+                    }
+                })
+                if (is_dpl == false) {
+                    this.cart_list.push({
+                        'product_id': product.id,
+                        'name': product.name,
+                        'qty': 1,
+                        'price': product.price,
+                    })
+                }
+                vm.calculate_Total()
+                this.count_product = this.cart_list.length;
+            },
+            calculate_Total() {
+                this.total_price = 0;
+                this.cart_list.forEach(obj => {
+                    let sub_total = parseFloat(obj.qty) * parseFloat(obj.price)
+                    this.total_price += sub_total
+                })
+
+                this.grand_total = this.total_price
+            },
+            delete_item(index_item) {
+                this.cart_list.splice(index_item, 1);
+                this.calculate_Total()
+                this.discount()
+            },
+            discount() {
+                this.grand_total = this.total_price - (this.total_price * this.discount_percent) / 100
+            },
+            payment() {
+                if (this.cart_list.length != 0) {
+                    if (parseFloat(this.payment_amount) >= parseFloat(this.grand_total)) {
+                        let vm = this
+                        let payment_data = {
+                            cart_list: vm.cart_list,
+                            total_price: vm.total_price,
+                            discount_percent: vm.discount_percent,
+                        }
+                        let url_api = "http://127.0.0.1:5000/pos/payment"
+                        axios.post(url_api, payment_data)
+                            .then(function (response) {
+                                vm.calculateReturn_price()
+                                vm.printReport()
+                                vm.getFetch()
+                                vm.clearData()
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: "Success",
+                                });
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Please add more money",
+                        });
+                        return
+                    }
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "No Item",
+                        text: "Please order product before pay.?",
+                    });
+                    return
+                }
+            },
+            calculateReturn_price() {
+                this.return_price=0
+                this.return_price = this.payment_amount - this.grand_total
+            }
+        },
+    }).mount('#app');
+</script>
+</body>
+</html>

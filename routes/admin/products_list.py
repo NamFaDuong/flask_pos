@@ -54,9 +54,10 @@ def new_product():
     brand_id = data['brand']
     category = data['category']
     unit_id = data['unit']
+    qty = data['qty']
     result = connection.execute(text(f"""
     INSERT INTO products VALUES(
-    NULL,'{name}', '{description}',{cost},{price},{category},{unit_id},{brand_id},{tag_id}
+    NULL,'{name}', '{description}',{cost},{price},{category},{unit_id},{brand_id},{tag_id},{qty}
     )
     """))
     connection.commit()
@@ -90,10 +91,49 @@ def update_product():
     WHERE id = {product_id}
     """))
     connection.commit()
-    return "Hello update"
+    return data
 
 
-
+@app.get("/products_detail")
+def products_detail():
+    product_id = request.args.get("id")
+    result = connection.execute(text(f"""
+            SELECT
+            products.id,
+            products.name,
+            products.description,
+            products.cost,
+            products.price,
+            categories.name AS category_name,
+            brands.name AS brand_name,
+            units.name AS unit_name,
+            tags.name AS tag_name
+            FROM
+            products
+            INNER JOIN categories ON products.category_id = categories.id
+            INNER JOIN brands ON products.brand_id = brands.id
+            INNER JOIN units ON products.unit_id = units.id
+            INNER JOIN tags ON products.tag_id = tags.id
+            where products.id = {product_id}
+        """))
+    record = result.fetchall()
+    data = []
+    for product in record:
+        data.append(
+            {
+                'id': product[0],
+                'name': product[1],
+                'description': product[2],
+                'cost': product[3],
+                'price': product[4],
+                'category_name': product[5],
+                'brand_name': product[6],
+                'unit_name': product[7],
+                'tag_name': product[8]
+            }
+        )
+    connection.commit()
+    return data
 
 
 def getProduct():
@@ -137,6 +177,54 @@ def getProduct():
                 'brand_id': product[10],
                 'unit_id': product[11],
                 'tag_id': product[12]
+            }
+        )
+    connection.commit()
+    return data
+
+
+
+def getProductForSale():
+    result = connection.execute(text("""
+        SELECT id,name,price,qty FROM products where qty > 0;
+    """))
+    record = result.fetchall()
+    data = []
+    for product in record:
+        data.append(
+            {
+                'id': product[0],
+                'name': product[1],
+                'price': product[2],
+                'qty': product[3],
+            }
+        )
+    connection.commit()
+    return data
+
+
+def getProductByCategory(category_id):
+    result = connection.execute(text(f"""
+            SELECT
+            products.id,
+            products.name,
+            products.description,
+            products.cost,
+            products.price
+            FROM
+            products
+            WHERE  category_id = {category_id}
+        """))
+    record = result.fetchall()
+    data = []
+    for product in record:
+        data.append(
+            {
+                'id': product[0],
+                'name': product[1],
+                'description': product[2],
+                'cost': product[3],
+                'price': product[4]
             }
         )
     connection.commit()

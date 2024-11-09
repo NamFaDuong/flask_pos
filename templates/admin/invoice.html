@@ -1,0 +1,203 @@
+{% extends 'admin/main_template.html' %}
+{% block navheader %}
+    Categories
+{% endblock %}
+{% block content %}
+    <div class="content-wrapper" id="app">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Invoice List</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Invoice List</a></li>
+                            <li class="breadcrumb-item active">Invoice</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+
+        {#  Pop up Invoice detail  #}
+        <div class="modal fade bd-example-modal-lg" id="invoices_detail" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Invoice ID: [[ invoice_id_detail ]]</h5>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Product ID</th>
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Order Qty</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(invoice, index) in invoice_detail">
+                                <th scope="row">[[ index + 1 ]]</th>
+                                <td>[[ invoice.product_id ]]</td>
+                                <td>[[ invoice.product_name ]]</td>
+                                <td>[[ invoice.order_qty ]]</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" @click="closeInvoiceDetail()">
+                            <i class="far fa-times-circle"></i>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#  Pop up Invoice detail  #}
+
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="search_bar" style="display: flex" id="search-bar">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control"
+                                               id="search_by_id"
+                                               placeholder="Search Invoice number" v-model="invoice_id">
+
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary ml-2" @click="getFilterbyInvoiceID()">Search by ID</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive" style="height: 450px;overflow-y:scroll;">
+                                    <table class="table table-striped border">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Invoice ID</th>
+                                            <th>Date time</th>
+                                            <th>Amount</th>
+                                            <th>Discount</th>
+                                            <th>Detail</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="userTableBody">
+                                        <tr v-for="(invoice, index) in invoices_list">
+                                            <td class="text-center">[[ invoice.invoice_id ]]</td>
+                                            <td class="text-left">[[ invoice.transaction_datetime ]]</td>
+                                            <td class="text-left">$[[ invoice.total_amount ]]</td>
+                                            <td class="text-left">[[ invoice.discount ]]%</td>
+                                            <td>
+                                                <button type="button" class="btn btn-outline-secondary mr-2" @click="getInvoiceDetail(invoice.invoice_id)">
+                                                    <i class="fas fa-eye"></i>
+                                                    view
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-success mr-1" disabled>
+                                                    Finish
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+{% endblock %}
+{% block scriptjs %}
+    <script>
+        const {createApp} = Vue;
+        createApp({
+            delimiters: ['[[', ']]'],
+            created() {
+                this.getAllInvoice()
+            },
+            data() {
+                return {
+                    invoices_list: [],
+                    invoice_detail: [],
+                    invoice_id_detail: 0,
+                    invoice_id: ''
+                };
+            },
+            methods: {
+                openInvoiceDetail() {
+                    $('#invoices_detail').modal('show')
+                },
+                closeInvoiceDetail() {
+                    $('#invoices_detail').modal('hide'),
+                    this.invoice_id = '',
+                        this.getAllInvoice()
+                },
+                getAllInvoice() {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/admin/invoice/getAllInvoice"
+                    // Make a request for a user with a given ID
+                    axios.get(url_api)
+                        .then(function (response) {
+                            vm.invoices_list = response.data
+                            $.LoadingOverlay("hide")
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                getInvoiceDetail(invoice_id) {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/admin/invoice/getInvoiceDetail?id=" + invoice_id
+                    axios.get(url_api)
+                        .then(function (response) {
+                            // handle success
+                            vm.invoice_id_detail = invoice_id
+                            vm.invoice_detail = response.data
+                            vm.openInvoiceDetail()
+                            $.LoadingOverlay("hide")
+
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
+                getFilterbyInvoiceID() {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/admin/invoice/getFilter_invoice_id?invoice_id=" + vm.invoice_id
+                    // Make a request for a user with a given ID
+                    axios.get(url_api)
+                        .then(function (response) {
+                            vm.invoices_list = response.data
+                            $.LoadingOverlay("hide")
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            },
+        }).mount('#app');
+    </script>
+{% endblock %}

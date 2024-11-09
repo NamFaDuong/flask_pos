@@ -1,6 +1,6 @@
 {% extends 'admin/main_template.html' %}
 {% block navheader %}
-Dashboard
+    Dashboard
 {% endblock %}
 {% block content %}
     <div class="content-wrapper" id="app">
@@ -30,9 +30,9 @@ Dashboard
                         <!-- small box -->
                         <div class="small-box bg-info">
                             <div class="inner">
-                                <h3>150</h3>
+                                <h3>$ [[count.income]]</h3>
 
-                                <p>New Orders</p>
+                                <p>Income</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -45,9 +45,9 @@ Dashboard
                         <!-- small box -->
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3>53<sup style="font-size: 20px">%</sup></h3>
+                                <h3>[[count.product]]</h3>
 
-                                <p>Bounce Rate</p>
+                                <p>Product</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -60,7 +60,7 @@ Dashboard
                         <!-- small box -->
                         <div class="small-box bg-warning">
                             <div class="inner">
-                                <h3>44</h3>
+                                <h3>[[count.user]]</h3>
 
                                 <p>User Registrations</p>
                             </div>
@@ -71,20 +71,20 @@ Dashboard
                         </div>
                     </div>
                     <!-- ./col -->
-                    <div class="col-lg-3 col-6">
-                        <!-- small box -->
-                        <div class="small-box bg-danger">
-                            <div class="inner">
-                                <h3>65</h3>
-
-                                <p>Unique Visitors</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-pie-graph"></i>
-                            </div>
-                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
+{#                    <div class="col-lg-3 col-6">#}
+{#                        <!-- small box -->#}
+{#                        <div class="small-box bg-danger">#}
+{#                            <div class="inner">#}
+{#                                <h3>65</h3>#}
+{##}
+{#                                <p>Unique Visitors</p>#}
+{#                            </div>#}
+{#                            <div class="icon">#}
+{#                                <i class="ion ion-pie-graph"></i>#}
+{#                            </div>#}
+{#                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>#}
+{#                        </div>#}
+{#                    </div>#}
                     <!-- ./col -->
                 </div>
                 <div class="row">
@@ -116,62 +116,15 @@ Dashboard
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr>
-                                            <td><a href="#">OR9842</a></td>
-                                            <td>Call of Duty IV</td>
-                                            <td><span class="badge badge-success">Shipped</span></td>
+                                        <tr v-for="item in count.last_order">
+                                            <td><a href="#">[[item.invoice_id]]</a></td>
+                                            <td>[[ item.product ]]</td>
+                                            <td><span class="badge badge-success">[[ item.category ]]</span></td>
                                             <td>
-                                                <div class="sparkbar" data-color="#00a65a" data-height="20">90,80,90,-70,61,-83,63</div>
+                                                <div class="sparkbar" data-color="#00a65a" data-height="20">[[ item.date ]]</div>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td><a href="#">OR1848</a></td>
-                                            <td>Samsung Smart TV</td>
-                                            <td><span class="badge badge-warning">Pending</span></td>
-                                            <td>
-                                                <div class="sparkbar" data-color="#f39c12" data-height="20">90,80,-90,70,61,-83,68</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><a href="#">OR7429</a></td>
-                                            <td>iPhone 6 Plus</td>
-                                            <td><span class="badge badge-danger">Delivered</span></td>
-                                            <td>
-                                                <div class="sparkbar" data-color="#f56954" data-height="20">90,-80,90,70,-61,83,63</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><a href="#">OR7429</a></td>
-                                            <td>Samsung Smart TV</td>
-                                            <td><span class="badge badge-info">Processing</span></td>
-                                            <td>
-                                                <div class="sparkbar" data-color="#00c0ef" data-height="20">90,80,-90,70,-61,83,63</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><a href="#">OR1848</a></td>
-                                            <td>Samsung Smart TV</td>
-                                            <td><span class="badge badge-warning">Pending</span></td>
-                                            <td>
-                                                <div class="sparkbar" data-color="#f39c12" data-height="20">90,80,-90,70,61,-83,68</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><a href="#">OR7429</a></td>
-                                            <td>iPhone 6 Plus</td>
-                                            <td><span class="badge badge-danger">Delivered</span></td>
-                                            <td>
-                                                <div class="sparkbar" data-color="#f56954" data-height="20">90,-80,90,70,-61,83,63</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><a href="#">OR9842</a></td>
-                                            <td>Call of Duty IV</td>
-                                            <td><span class="badge badge-success">Shipped</span></td>
-                                            <td>
-                                                <div class="sparkbar" data-color="#00a65a" data-height="20">90,80,90,-70,61,-83,63</div>
-                                            </td>
-                                        </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -215,16 +168,30 @@ Dashboard
         createApp({
             delimiters: ['[[', ']]'],
             created() {
-                $.LoadingOverlay("show");
-                $.LoadingOverlay("hide");
+                this.getData()
             },
             data() {
                 return {
-
+                    count:[]
                 };
             },
             methods: {
-
+                getData() {
+                    let vm = this
+                    $.LoadingOverlay("show");
+                    let url_api = "http://127.0.0.1:5000/admin/countdata"
+                    // Make a request for a user with a given ID
+                    axios.get(url_api)
+                        .then(function (response) {
+                            // handle success
+                            vm.count = response.data
+                            $.LoadingOverlay("hide")
+                        })
+                        .catch(function (error) {
+                            alert("error")
+                            console.log(error);
+                        });
+                },
             }
         }).mount('#app');
     </script>

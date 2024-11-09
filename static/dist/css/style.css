@@ -1,0 +1,516 @@
+/*=============== GOOGLE FONTS ===============*/
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Poppins:wght@400;500&display=swap");
+/*=============== VARIABLES CSS ===============*/
+:root {
+    --header-height: 3.5rem;
+
+    /*========== Colors ==========*/
+    /*Color mode HSL(hue, saturation, lightness)*/
+    --title-color: hsl(0, 0%, 0%);
+    --text-color: hsl(0, 0%, 0%);
+    --button-text-color: hsl(0, 0%, 100%);
+    --button-unover-color: #9b9b9b;
+    --text-color-description: hsl(234, 28%, 65%);
+    --body-color: hsl(0, 0%, 88%);
+    --card-color: #219ebc;
+
+    /*========== Font and typography ==========*/
+    /*.5rem = 8px | 1rem = 16px ...*/
+    --body-font: "Poppins", sans-serif;
+    --second-font: "Montserrat", sans-serif;
+    --biggest-font-size: 2.75rem;
+    --h1-font-size: 1.5rem;
+    --h2-font-size: 1.25rem;
+    --h3-font-size: 1rem;
+    --normal-font-size: .938rem;
+    --small-font-size: .813rem;
+    --smaller-font-size: .75rem;
+
+    /*========== Font weight ==========*/
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semi-bold: 600;
+
+    /*========== z index ==========*/
+    --z-tooltip: 10;
+    --z-fixed: 100;
+}
+
+
+/*========== Responsive typography ==========*/
+@media screen and (min-width: 1152px) {
+    :root {
+        --biggest-font-size: 5.5rem;
+        --h1-font-size: 2.5rem;
+        --h2-font-size: 1.5rem;
+        --h3-font-size: 1.25rem;
+        --normal-font-size: 1rem;
+        --small-font-size: .875rem;
+        --smaller-font-size: .813rem;
+    }
+}
+
+/*=============== BASE ===============*/
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.screenshot-blocker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.01);
+    pointer-events: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body,
+button,
+input {
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    color: var(--text-color);
+}
+
+body {
+    background-color: var(--body-color);
+}
+
+button,
+input {
+    outline: none;
+    border: none;
+}
+
+h1, h2, h3, h4 {
+    color: var(--title-color);
+    font-family: var(--second-font);
+    font-weight: var(--font-semi-bold);
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/*=============== REUSABLE CSS CLASSES ===============*/
+.container {
+    max-width: 1120px;
+    margin-inline: 1.5rem;
+}
+
+.grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.section {
+    padding-block: 5rem 1rem;
+}
+
+.section__title {
+    text-align: center;
+    font-size: var(--h1-font-size);
+    margin-bottom: 1.5rem;
+}
+
+.main {
+    overflow: hidden; /* For animation ScrollReveal */
+}
+
+/* Header */
+.header {
+    display: flex;
+    padding-top: .5rem;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.nav {
+    justify-content: space-between;
+}
+
+.currency,
+.date_time {
+    display: flex;
+}
+
+.date_time i {
+    margin: auto;
+    padding-right: 10px;
+}
+
+.datetime {
+    margin: auto;
+}
+
+.equal,
+.currency__dollar {
+    margin: auto;
+}
+
+/* Content */
+.main {
+    display: flex;
+    padding-top: 10px;
+    height: 100%;
+}
+
+.content__container {
+    width: 100%;
+    margin: 0 1rem;
+}
+
+.order__container {
+    width: 40%;
+    height: 100%;
+    padding: 10px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset;
+    border-radius: 5px;
+}
+
+
+/* Order table */
+.invoice_number {
+    text-align: center;
+}
+
+.invoice_number h3 {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: var(--normal-font-size);
+}
+
+.cart__container {
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.cart__card {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-color);
+    border-radius: 5px;
+    height: 50px;
+    margin-bottom: .5rem;
+}
+
+.cart__box {
+    padding: .75rem 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.cart__img {
+    width: 30px;
+}
+
+.cart__details {
+    display: flex;
+    margin: auto;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.product_infor {
+    margin: auto 0;
+
+}
+
+.cart__title {
+    font-size: 12px;
+    margin-bottom: 0.5px;
+}
+
+.cart__price {
+    display: block;
+    font-size: var(--small-font-size);
+    margin-bottom: 1.5px;
+}
+
+.cart__amount,
+.cart__amount-content {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.cart__amount {
+    column-gap: 3rem;
+}
+
+.cart__amount-content {
+    column-gap: 1rem;
+}
+
+.cart__amount-box {
+    display: inline-flex;
+    padding: .25rem;
+    color: var(--button-text-color);
+    background-color: var(--card-color);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.cart__prices {
+    margin-top: .5rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cart__prices {
+    margin-top: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.total__price-Dollar,
+.total__price-khmer {
+    font-family: 'Khmer OS Battambang';
+    font-size: 15px;
+}
+
+.total__price {
+    font-size: 15px;
+}
+
+.cart__price-item {
+    font-size: var(--small-font-size);
+}
+
+.cart__price-total {
+    font-size: var(--h3-font-size);
+    font-weight: var(--font-medium);
+}
+
+.cart__amount-number {
+    font-size: var(--normal-font-size);
+}
+
+.button__action {
+    display: flex;
+    justify-content: end;
+}
+
+
+/* Product */
+.production {
+    height: 500px;
+    overflow-y: scroll;
+}
+
+.product__items {
+    grid-template-columns: repeat(5, 1fr);
+    gap: .5rem;
+}
+
+.product__content {
+    position: relative;
+    background-color: var(--body-color);
+    padding: 1rem 1rem;
+    border-radius: 1rem;
+    text-align: center;
+    width: 200px;
+    height: 200px;
+}
+
+.product__img {
+    margin: auto;
+    width: 100px;
+    transition: .5s;
+    filter: drop-shadow(3px 1px 4px #545455);
+}
+
+.product__title {
+    font-size: 15px;
+    overflow-y: scroll;
+}
+
+.product__content:hover .product__img {
+    transform: translateY(-.5rem);
+}
+
+
+.animation-ctn {
+    text-align: center;
+    margin-top: 5em;
+}
+
+@-webkit-keyframes checkmark {
+    0% {
+        stroke-dashoffset: 100px
+    }
+
+    100% {
+        stroke-dashoffset: 200px
+    }
+}
+
+@-ms-keyframes checkmark {
+    0% {
+        stroke-dashoffset: 100px
+    }
+
+    100% {
+        stroke-dashoffset: 200px
+    }
+}
+
+@keyframes checkmark {
+    0% {
+        stroke-dashoffset: 100px
+    }
+
+    100% {
+        stroke-dashoffset: 0px
+    }
+}
+
+@-webkit-keyframes checkmark-circle {
+    0% {
+        stroke-dashoffset: 480px
+
+    }
+
+    100% {
+        stroke-dashoffset: 960px;
+
+    }
+}
+
+@-ms-keyframes checkmark-circle {
+    0% {
+        stroke-dashoffset: 240px
+    }
+
+    100% {
+        stroke-dashoffset: 480px
+    }
+}
+
+@keyframes checkmark-circle {
+    0% {
+        stroke-dashoffset: 480px
+    }
+
+    100% {
+        stroke-dashoffset: 960px
+    }
+}
+
+@keyframes colored-circle {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 100
+    }
+}
+
+/* other styles */
+/* .svg svg {
+    display: none
+}
+ */
+.inlinesvg .svg svg {
+    display: inline
+}
+
+/* .svg img {
+    display: none
+} */
+
+.icon--order-success svg polyline {
+    -webkit-animation: checkmark 0.25s ease-in-out 0.7s backwards;
+    animation: checkmark 0.25s ease-in-out 0.7s backwards
+}
+
+.icon--order-success svg circle {
+    -webkit-animation: checkmark-circle 0.6s ease-in-out backwards;
+    animation: checkmark-circle 0.6s ease-in-out backwards;
+}
+
+.icon--order-success svg circle#colored {
+    -webkit-animation: colored-circle 0.6s ease-in-out 0.7s backwards;
+    animation: colored-circle 0.6s ease-in-out 0.7s backwards;
+}
+
+
+@media print {
+    /* Report style */
+    .reportContent {
+        width: 6in;
+        height: 8in;
+    }
+
+    .header_report {
+        margin: auto;
+    }
+
+    .img_logo_content {
+        display: flex;
+        justify-content: center;
+        padding-bottom: 1rem;
+    }
+
+    .logo_report {
+        width: 1in;
+    }
+
+    .title_report {
+        text-align: center;
+    }
+
+    .content {
+        display: flex;
+        justify-content: center;
+    }
+
+    .left_report_content_1 {
+        padding-right: 4rem;
+    }
+
+    .right_report_content_1 {
+        padding-left: 4rem;
+    }
+
+    .text_infor {
+        padding-bottom: .5rem;
+        font-size: 14px;
+    }
+
+    .content_report {
+        display: flex;
+        justify-content: center;
+    }
+
+    .content_report table {
+        width: 400px;
+    }
+
+    .qr_report {
+        width: 300px;
+    }
+    .footer_report{
+        display: flex;
+        padding-left: 20rem;
+    }
+}
+
+
